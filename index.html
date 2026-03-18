@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmniSound v2.0 – The Living Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-dark': '#0a0a0f',
+              'brand-surface': '#12122b',
+              'brand-primary': '#00f6ff', // cyan
+              'brand-secondary': '#ff00c1', // magenta
+              'brand-light': '#e0e0e0',
+              'brand-muted': '#8e8e9e',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Orbitron', 'sans-serif'],
+            },
+            keyframes: {
+              'fade-in': {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              'pulse-glow': {
+                '0%, 100%': { boxShadow: '0 0 10px -5px currentColor' },
+                '50%': { boxShadow: '0 0 20px 0px currentColor' },
+              },
+              'audio-wave': {
+                '0%': { transform: 'scaleY(0.1)' },
+                '50%': { transform: 'scaleY(1)' },
+                '100%': { transform: 'scaleY(0.1)' },
+              },
+              'grid-fade': {
+                '0%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+                '100%': { transform: 'translateY(-100%) scale(2)', opacity: '0' },
+              },
+              'marquee': {
+                '0%': { transform: 'translateX(100%)' },
+                '100%': { transform: 'translateX(-100%)' },
+              }
+            },
+            animation: {
+              'fade-in': 'fade-in 0.5s ease-out forwards',
+              'pulse-glow': 'pulse-glow 4s infinite ease-in-out',
+              'wave-1': 'audio-wave 1.2s infinite ease-in-out',
+              'wave-2': 'audio-wave 1.0s infinite ease-in-out',
+              'wave-3': 'audio-wave 1.4s infinite ease-in-out',
+              'wave-4': 'audio-wave 0.8s infinite ease-in-out',
+              'wave-5': 'audio-wave 1.1s infinite ease-in-out',
+              'grid-fade': 'grid-fade 20s linear infinite',
+              'marquee': 'marquee 30s linear infinite',
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Global CSS Protection and Normalization */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Prevent iOS Safari from dimming clickable elements */
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 16px; /* Ensure base font size */
+        touch-action: manipulation; /* Improve responsiveness on touch devices */
+        overflow: hidden; /* Prevent body scroll due to grid */
+      }
+
+      /* Ensure canvases do not interfere with pointer events for other elements */
+      canvas {
+          pointer-events: none; /* Canvases are purely display, not interactive elements */
+      }
+
+      /* Basic accessibility for outlines */
+      :focus-visible {
+        outline: 2px solid var(--color-brand-primary); /* Custom focus outline */
+        outline-offset: 2px;
+      }
+
+      button, input, select, textarea {
+        font-family: inherit; /* Inherit font from body */
+      }
+
+      /* Hyper-realism Digital Aesthetics */
+      :root {
+        --grid-color: rgba(0, 246, 255, 0.1);
+        --grid-spacing: 50px;
+        --grid-perspective: 800px;
+      }
+
+      #hyper-grid-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        perspective: var(--grid-perspective);
+        overflow: hidden;
+        z-index: -1; /* Behind all content */
+        background-color: var(--color-brand-dark); /* Ensure base color for grid */
+      }
+
+      #interactive-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #scanline-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          rgba(0, 0, 0, 0.1) 1px,
+          transparent 2px
+        );
+        pointer-events: none;
+        z-index: 100; /* Above everything for visual effect */
+        opacity: 0.1;
+      }
+
+      /* Clip-path for Card components */
+      .clip-card-omnisound {
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+      }
+
+      /* Thermal Vision Filter for Images */
+      .thermal-vision-filter {
+        filter: sepia(1) hue-rotate(200deg) saturate(3) contrast(1.5); /* Cyan/Blue thermal effect */
+        transition: filter 0.3s ease-in-out;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "three": "https://esm.sh/three@^0.182.0"
+  }
+}
+</script>
+    <!-- Nailea Omni PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="theme-color" content="#060608" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // FIX: Explicitly use window.location.origin to ensure the Service Worker script is registered from the correct origin.
+          navigator.serviceWorker.register(window.location.origin + '/sw.js').then(reg => {
+            console.log('[Nailea] ServiceWorker registrado:', reg.scope);
+          }).catch(err => {
+            console.error('[Nailea] Error al registrar ServiceWorker:', err);
+          });
+        });
+      }
+    </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gradient-to-br from-brand-dark to-brand-surface text-brand-light font-sans">
+    <div id="hyper-grid-container">
+      <canvas id="interactive-grid"></canvas>
+    </div>
+    <div id="scanline-overlay"></div>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+    <script>
+      // Interactive 3D Grid Script (Pure JS for performance and global effect)
+      const canvas = document.getElementById('interactive-grid');
+      const ctx = canvas.getContext('2d');
+      let animationFrameId;
+
+      const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      const drawGrid = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const gridSize = 50; // Size of each grid square
+        const gridColor = 'rgba(0, 246, 255, 0.05)'; // Faint cyan
+        const horizonY = canvas.height * 0.7; // Horizon line Y position
+        const perspectiveFactor = 0.005; // How much perspective distorts lines
+
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+
+        // Draw horizontal lines
+        for (let i = 0; i < canvas.height; i += gridSize) {
+          const y = horizonY + (i - horizonY) * (1 + (i - horizonY) * perspectiveFactor);
+          if (y > canvas.height) continue;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        // Draw vertical lines
+        for (let i = 0; i < canvas.width; i += gridSize) {
+          const xOffset = (canvas.width / 2 - i) * perspectiveFactor * (canvas.height - horizonY) * 0.1;
+          ctx.beginPath();
+          ctx.moveTo(i + xOffset, horizonY);
+          ctx.lineTo(i - (canvas.width / 2 - i) * perspectiveFactor * (canvas.height - horizonY) * 0.5, canvas.height); // Adjust lower point more
+          ctx.stroke();
+        }
+      };
+
+      const animateGrid = () => {
+        drawGrid();
+        animationFrameId = requestAnimationFrame(animateGrid);
+      };
+
+      animateGrid();
+    </script>
+  </body>
+</html>
